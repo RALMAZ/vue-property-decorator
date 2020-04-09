@@ -23,12 +23,8 @@ type InjectOptions = { from?: InjectKey; default?: any }
  */
 export function Inject(options?: InjectOptions | InjectKey) {
   return createDecorator((componentOptions, key) => {
-    if (typeof componentOptions.inject === 'undefined') {
-      componentOptions.inject = {}
-    }
-    if (!Array.isArray(componentOptions.inject)) {
-      componentOptions.inject[key] = options || key
-    }
+    if (typeof componentOptions.inject === 'undefined') componentOptions.inject = {}
+    if (!Array.isArray(componentOptions.inject)) componentOptions.inject[key] = options || key
   })
 }
 
@@ -39,12 +35,10 @@ export function Inject(options?: InjectOptions | InjectKey) {
  */
 export function InjectReactive(options?: InjectOptions | InjectKey) {
   return createDecorator((componentOptions, key) => {
-    if (typeof componentOptions.inject === 'undefined') {
-      componentOptions.inject = {}
-    }
+    if (typeof componentOptions.inject === 'undefined') componentOptions.inject = {}
     if (!Array.isArray(componentOptions.inject)) {
       const fromKey = !!options ? (options as any).from || options : key
-      const defaultVal = (!!options && (options as any).default) || undefined
+      const defaultVal = !!options && (options as any).default || undefined
       if (!componentOptions.computed) componentOptions.computed = {}
       componentOptions.computed![key] = function() {
         const obj = (this as any)[reactiveInjectKey]
@@ -213,11 +207,8 @@ export function Watch(path: string, options: WatchOptions = {}) {
 
     const watch: any = componentOptions.watch
 
-    if (typeof watch[path] === 'object' && !Array.isArray(watch[path])) {
-      watch[path] = [watch[path]]
-    } else if (typeof watch[path] === 'undefined') {
-      watch[path] = []
-    }
+    if (typeof watch[path] === 'object' && !Array.isArray(watch[path])) watch[path] = [watch[path]]
+    else if (typeof watch[path] === 'undefined') watch[path] = []
 
     watch[path].push({ handler, deep, immediate })
   })
@@ -244,13 +235,8 @@ export function Emit(event?: string) {
 
       const returnValue: any = original.apply(this, args)
 
-      if (isPromise(returnValue)) {
-        returnValue.then(returnValue => {
-          emit(returnValue)
-        })
-      } else {
-        emit(returnValue)
-      }
+      if (isPromise(returnValue)) returnValue.then(returnValue => emit(returnValue))
+      else emit(returnValue)
 
       return returnValue
     }
